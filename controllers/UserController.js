@@ -20,7 +20,7 @@ class UserController {
                 values.photo = content;
 
                 this.addLine(values);
-                console.log(values.photo);
+                // console.log(values.photo);
             });
 
         });
@@ -37,7 +37,7 @@ class UserController {
             }
         });
 
-        console.log(elements[0].files[0]);
+        // console.log(elements[0].files[0]);
 
         let file = elements[0].files[0];
 
@@ -49,7 +49,7 @@ class UserController {
 
         // console.log(elements);
 
-        // fileReader.readAsDataURL(file);
+        fileReader.readAsDataURL(file);
     }
 
     getValues() {
@@ -60,10 +60,14 @@ class UserController {
 
             if (field.name == 'gender') {
 
-                if (field.checked) { user[field.name] = field.value; }
+                if (field.checked) {
+                    user[field.name] = field.value;
+                    console.log(field.name, user[field.name] = field.value);
+                }
 
             } else {
                 user[field.name] = field.value;
+                console.log(field.name, user[field.name] = field.value);
             }
         });
 
