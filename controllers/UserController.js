@@ -55,7 +55,7 @@ class UserController {
                         <td>${Utils.dateFormat(result._register)}</td>
                         <td>
                             <button type="button" class="btn btn-primary btn-xs btn-edit btn-flat">Editar</button>
-                            <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
+                            <button type="button" class="btn btn-danger btn-xs btn-delete btn-flat">Excluir</button>
                         </td>
                     `;
 
@@ -204,7 +204,7 @@ class UserController {
             <td>${Utils.dateFormat(dataUser.register)}</td>
             <td>
                 <button type="button" class="btn btn-primary btn-xs btn-edit btn-flat">Editar</button>
-                <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
+                <button type="button" class="btn btn-danger btn-xs btn-delete btn-flat">Excluir</button>
             </td>
         `;
 
@@ -216,6 +216,15 @@ class UserController {
     }
 
     addEventsTr(tr) {
+
+        tr.querySelector('.btn-delete').addEventListener("click", e => {
+
+            if (confirm("deseja realmente excluir?")) {
+                tr.remove();
+                this.showPanelCreate();
+            }
+        });
+
         tr.querySelector('.btn-edit').addEventListener('click', e => {
 
             let json = JSON.parse(tr.dataset.user);
