@@ -13,43 +13,66 @@ class UserController {
 
             e.preventDefault();
 
+            let btn = this.formEl.querySelector('[type=submit]');
+
+            btn.disabled = true;
+
             let values = this.getValues();
 
-            this.getPhoto((content) => {
+            this.getPhoto().then(
+                content => {
+                    values.photo = content;
 
-                values.photo = content;
+                    this.addLine(values);
 
-                this.addLine(values);
-                // console.log(values.photo);
-            });
+                    this.formEl.reset();
+
+                    btn.disabled = false;
+                },
+                e => {
+                    console.error(e);
+                }
+            );
 
         });
 
     }
 
-    getPhoto(callback) {
+    // this method gets the photo url and reads the photo file
+    getPhoto() {
 
-        let fileReader = new FileReader();
+        return new Promise((resolve, reject) => {
 
-        let elements = [...this.formEl.elements].filter(item => {
-            if (item.name === 'photo') {
-                return item;
+            let fileReader = new FileReader();
+
+            let elements = [...this.formEl.elements].filter(item => {
+                if (item.name === 'photo') {
+                    return item;
+                }
+            });
+
+            let file = elements[0].files[0];
+
+            fileReader.onload = () => {
+
+
+                resolve(fileReader.result);
+
+            };
+
+            fileReader.onerror = e => {
+
+                reject(e);
+
+            };
+            if (file) {
+                fileReader.readAsDataURL(file);
+            } else {
+                resolve('dist/img/boxed-bg.jpg');
             }
+
         });
 
-        // console.log(elements[0].files[0]);
-
-        let file = elements[0].files[0];
-
-        fileReader.onload = () => {
-
-            callback(fileReader.result);
-
-        };
-
-        // console.log(elements);
-
-        fileReader.readAsDataURL(file);
     }
 
     getValues() {
@@ -60,15 +83,14 @@ class UserController {
 
             if (field.name == 'gender') {
 
-                if (field.checked) {
-                    user[field.name] = field.value;
-                    console.log(field.name, user[field.name] = field.value);
-                }
+                if (field.checked) { user[field.name] = field.value; }
 
-            } else {
-                user[field.name] = field.value;
-                console.log(field.name, user[field.name] = field.value);
-            }
+            } else if (field.name == 'admin') {
+
+                user[field.name] = field.checked;
+
+            } else { user[field.name] = field.value; }
+
         });
 
         return new User(
@@ -86,17 +108,20 @@ class UserController {
 
     addLine(dataUser) {
 
-        this.tableEl.innerHTML = `    
-        <tr>
+        let tr = document.createElement('tr');
+
+        tr.innerHTML = `    
             <td><img src="${dataUser.photo}" alt="User Image" class="img-circle img-sm"></td>
             <td>${dataUser.name}</td>
             <td>${dataUser.email}</td>
-            <td>${dataUser.admin}</td>
-            <td>${dataUser.birth}</td>
+            <td>${dataUser.admin ? 'Sim' : 'Não'}</td>
+            <td>${Utils.dateFormat(dataUser.register)}</td>
             <td>
                 <button type="button" class="btn btn-primary btn-xs btn-flat">Editar</button>
                 <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
             </td>
-        </tr>`;
+        `;
+
+        this.tableEl.appendChild(tr);
     }
 }
