@@ -19,6 +19,8 @@ class UserController {
 
             let values = this.getValues();
 
+            if(!values) { return false; }
+
             this.getPhoto().then(
                 content => {
                     values.photo = content;
@@ -78,8 +80,15 @@ class UserController {
     getValues() {
 
         let user = {};
+        var isValid = true;
 
         [...this.formEl.elements].forEach(function(field, index) {
+
+            if (['name', 'email', 'password'].indexOf(field.name) > -1 && !field.value){
+                field.parentElement.classList.add('has-error');
+
+                isValid = false;
+            }
 
             if (field.name == 'gender') {
 
@@ -92,6 +101,10 @@ class UserController {
             } else { user[field.name] = field.value; }
 
         });
+
+        if(!isValid){
+            return false;
+        }
 
         return new User(
             user.name,
@@ -123,5 +136,7 @@ class UserController {
         `;
 
         this.tableEl.appendChild(tr);
+
+        this.updateCount();
     }
 }
