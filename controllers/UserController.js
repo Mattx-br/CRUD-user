@@ -222,6 +222,7 @@ class UserController {
             if (confirm("deseja realmente excluir?")) {
                 tr.remove();
                 this.showPanelCreate();
+                this.updateCount();
             }
         });
 
