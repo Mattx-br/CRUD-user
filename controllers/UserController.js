@@ -1,12 +1,14 @@
 class UserController {
 
     constructor(formIdCreate, formIdUpdate, tableId) {
+
         this.formEl = document.querySelector('#' + formIdCreate);
         this.formUpdateEl = document.querySelector('#' + formIdUpdate);
         this.tableEl = document.getElementById(tableId);
 
         this.onSubmit();
         this.onEdit();
+        this.selectAll();
 
     }
 
@@ -45,21 +47,15 @@ class UserController {
                         result._photo = content;
                     }
 
-                    tr.dataset.user = JSON.stringify(result);
+                    let user = new User();
 
-                    tr.innerHTML = `    
-                        <td><img src="${result._photo}" alt="User Image" class="img-circle img-sm"></td>
-                        <td>${result._name}</td>
-                        <td>${result._email}</td>
-                        <td>${result._admin ? 'Sim' : 'Não'}</td>
-                        <td>${Utils.dateFormat(result._register)}</td>
-                        <td>
-                            <button type="button" class="btn btn-primary btn-xs btn-edit btn-flat">Editar</button>
-                            <button type="button" class="btn btn-danger btn-xs btn-delete btn-flat">Excluir</button>
-                        </td>
-                    `;
+                    user.loadFromJSON(result);
 
-                    this.addEventsTr(tr);
+                    user.save();
+
+                    this.getTr(user, tr);
+
+                    // this.addEventsTr(tr);
 
                     this.updateCount();
 
@@ -90,7 +86,7 @@ class UserController {
 
             let values = this.getValues(this.formEl);
 
-            if (!values) { return false; }
+            if (!values) { btn.disabled = false; return false; }
 
             this.getPhoto(this.formEl).then(
                 content => {
@@ -98,9 +94,13 @@ class UserController {
 
                     this.addLine(values);
 
+                    values.save();
+
                     this.formEl.reset();
 
                     btn.disabled = false;
+
+                    // field.parentElement.classList.remove('has-error');
                 },
                 e => {
                     console.error(e);
@@ -190,9 +190,43 @@ class UserController {
 
     }
 
+    getUsersStorage() {
+        let users = [];
+
+        if (localStorage.getItem("users")) {
+            users = JSON.parse(localStorage.getItem("users"));
+        }
+
+        return users;
+    }
+
+    selectAll() {
+        let users = this.getUsersStorage();
+
+        users.forEach(dataUser => {
+
+            let user = new User();
+
+            user.loadFromJSON(dataUser);
+
+            this.addLine(user);
+
+        })
+
+    }
+
     addLine(dataUser) {
 
-        let tr = document.createElement('tr');
+        let tr = this.getTr(dataUser);
+
+        this.tableEl.appendChild(tr);
+
+        this.updateCount();
+    }
+
+    getTr(dataUser, tr = null) {
+
+        if (tr === null) tr = document.createElement('tr');
 
         tr.dataset.user = JSON.stringify(dataUser);
 
@@ -210,9 +244,7 @@ class UserController {
 
         this.addEventsTr(tr);
 
-        this.tableEl.appendChild(tr);
-
-        this.updateCount();
+        return tr;
     }
 
     addEventsTr(tr) {
@@ -220,6 +252,9 @@ class UserController {
         tr.querySelector('.btn-delete').addEventListener("click", e => {
 
             if (confirm("deseja realmente excluir?")) {
+                let user = new User();
+                user.loadFromJSON(JSON.parse(tr.dataset.user));
+                user.remove();
                 tr.remove();
                 this.showPanelCreate();
                 this.updateCount();
