@@ -55,40 +55,58 @@ class User {
     }
 
     getNewID() {
-        if (!window.id) window.id = 0;
 
-        id++;
+        let usersID = parseInt(localStorage.getItem("usersID"));
 
-        return id
+        if (!usersID) usersID = 0;
+
+        usersID++;
+
+        localStorage.setItem("usersID", usersID);
+
+        return usersID
     }
 
     save() {
-            let users = User.getUsersStorage();
+        let users = User.getUsersStorage();
 
-            if (this.id > 0) {
+        if (this.id > 0) {
 
-                users.map(u => {
+            users.map(u => {
 
-                    if (u._id == this._id) {
+                if (u._id == this._id) {
 
-                        Object.assign(u, this);
-                    }
+                    Object.assign(u, this);
+                }
 
-                    return u;
-                });
+                return u;
+            });
 
-            } else {
+        } else {
 
-                this._id = this.getNewID();
+            this._id = this.getNewID();
 
-                users.push(this);
-
-            }
-
-            localStorage.setItem("users", JSON.stringify(users));
+            users.push(this);
 
         }
-        // remove(){
 
-    // }
+        localStorage.setItem("users", JSON.stringify(users));
+
+    }
+    remove() {
+
+        let users = User.getUsersStorage();
+
+        users.forEach((userData, index) => {
+
+            if (this._id == userData._id) {
+
+                users.splice(index, 1);
+
+            }
+        });
+
+        localStorage.setItem("users", JSON.stringify(users));
+
+    }
 }

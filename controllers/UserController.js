@@ -100,7 +100,6 @@ class UserController {
 
                     btn.disabled = false;
 
-                    // field.parentElement.classList.remove('has-error');
                 },
                 e => {
                     console.error(e);
@@ -169,13 +168,19 @@ class UserController {
 
                 user[field.name] = field.checked;
 
-            } else { user[field.name] = field.value; }
+            } else {
+                user[field.name] = field.value;
+            }
 
         });
 
         if (!isValid) {
             return false;
         }
+
+        formEl.elements["name"].parentElement.classList.remove('has-error');
+        formEl.elements["email"].parentElement.classList.remove('has-error');
+        formEl.elements["password"].parentElement.classList.remove('has-error');
 
         return new User(
             user.name,
@@ -190,18 +195,9 @@ class UserController {
 
     }
 
-    getUsersStorage() {
-        let users = [];
-
-        if (localStorage.getItem("users")) {
-            users = JSON.parse(localStorage.getItem("users"));
-        }
-
-        return users;
-    }
-
     selectAll() {
-        let users = this.getUsersStorage();
+
+        let users = User.getUsersStorage();
 
         users.forEach(dataUser => {
 
