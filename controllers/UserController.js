@@ -162,7 +162,10 @@ class UserController {
 
             if (field.name == 'gender') {
 
-                if (field.checked) { user[field.name] = field.value; }
+                if (field.checked) {
+                    console.log(user[field.name]);
+                    user[field.name] = field.value;
+                }
 
             } else if (field.name == 'admin') {
 
@@ -277,8 +280,11 @@ class UserController {
                             break;
 
                         case 'radio':
-                            field = this.formUpdateEl.querySelector("[name=" + name.replace("_", "") + "][values=" + json[name] + "]");
-                            // field.checked = true;
+                            console.log(json[name]);
+                            field = this.formUpdateEl.querySelector("[name=" + name.replace("_", "") + "][value=" + json[name] + "]");
+                            console.log(this.formUpdateEl.querySelector("[name='gender'][value='feminino']"));
+                            // console.log(this.formUpdateEl.querySelector("[name='gender']:checked"));
+                            field.checked = true;
                             break;
 
                         case 'checkbox':
